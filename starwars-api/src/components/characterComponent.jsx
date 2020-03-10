@@ -10,86 +10,69 @@ export class Characters extends React.Component {
         search: "",
         list: [],
         currentFilm: ""
+
     };
 
 
     baseURL = "api/";
 
-    componentDidMount = () => {
+    async axiosCall() {
+
+        let url = `${this.baseURL}people`;
+        let charArr = [];
+        while (url) {
+
+            let response = await fetch(url);
+            let json = await response.json();
+
+            url = json.next;
+
+            if (url != null) {
+                url = url.replace("https://swapi.co/", "");
+            }
+            else {
+                url = null;
+            }
+
+            let allCharacters = json.results;
 
 
-        axios
-            .get(`${this.baseURL}people`)
-            .then(response => {
-                // map returned json data to objects
-                // console.log(response.response.parse)
-                const characterJSON = JSON.parse(response.request.response);
+            allCharacters.forEach(character => {
+                // console.log("character elements", character.homeworld);
 
-                // console.log("character json", characterJSON);
+                axios
+                    .get(character.homeworld)
+                    .then(homeworldResponse => {
 
-                // const allCharacters = characterJSON.results.map(obj => obj.name);
-                const allCharacters = characterJSON.results;
-                const nextURL = characterJSON.next;
+                        character.homeworld = homeworldResponse.data.name;
 
-                // while (nextURL != null) {
-                    console.log("next url", nextURL);
+                        let characterFilms = [];
 
+                        character.films.forEach(flm => {
 
-                    allCharacters.forEach(character => {
-                        // console.log("character elements", character.homeworld);
+                            axios
+                                .get(flm)
+                                .then(filmResponse => {
 
+                                    characterFilms.push(filmResponse.data.title)
 
-                        axios
-                            .get(character.homeworld)
-                            .then(homeworldResponse => {
-
-                                // console.log("homeworld Response", homeworldResponse)
-
-                                character.homeworld = homeworldResponse.data.name;
-                                // let homeworldJSON = JSON.parse(homeworldResponse.data);
-                                // console.log("homeworld", character.homeworld);
-
-                                let characterFilms = [];
-
-                                character.films.forEach(flm => {
-
-                                    axios
-                                        .get(flm)
-                                        .then(filmResponse => {
-
-                                            // console.log("film Response", filmResponse);
-
-                                            characterFilms.push(filmResponse.data.title)
-
-                                            // console.log("character", character.name);
-                                            // console.log("counter", i)
-                                            // console.log("individual films", character.films[i])
-
-                                            character.films = characterFilms
-                                            console.log("all chars", allCharacters);
-
-
-                                            this.setState({ allCharacters, list: allCharacters });
-
-                                        })
+                
+                                    character.films = characterFilms
+                                    console.log("all chars", allCharacters);
+                                
+                                    this.setState({ charArr, allPlanets: charArr});
                                 })
-                                // this.setState({ allCharacters, list: allCharacters });
+                        })
 
-
-                            })
-
-                        // this.setState({ allCharacters, list: allCharacters });
-                        // console.log("allcharacters", allCharacters);
-
-
-                    });
-                // }
+                    })
 
             })
-            .catch(error => {
-                console.error(error);
-            });
 
+            charArr.push(...allCharacters);
+
+        }
+        
+        this.setState({charArr, allCharacters: charArr});
 
     };
 
