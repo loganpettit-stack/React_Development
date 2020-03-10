@@ -9,7 +9,8 @@ export class Films extends React.Component {
     state = {
         allFilms: [],
         search: "",
-        list: []
+        list: [],
+        _isMounted: false
     };
 
 
@@ -26,40 +27,62 @@ export class Films extends React.Component {
 
                 const allFilms = characterJSON.results
 
-                this.setState({ allFilms, list: allFilms });
+                this.setState({ allFilms, list: allFilms }); 
             })
             .catch(error => {
                 console.error(error);
             });
+
+       
     };
 
 
     componentDidMount() {
+        this._isMounted = true;
         this.axiosCall();
     }
 
 
     handleSearch = event => {
         this.setState({
-            searchTerm: event.target.value,
-            posts: this.state.allPosts.filter(post =>
-                post.title.includes(event.target.value)
+            search: event.target.value,
+            allFilms: this.state.allFilms.filter(film =>
+                film.title.includes(event.target.value)
             )
         });
     };
 
+    
+    clearSearch = event => {
+        console.log("this state", this.state)
+        const allFilms = this.state.list
+        const search = ""
+
+        this.setState({
+            allFilms,
+            search
+        });
+
+        console.log("this state after", this.state);
+
+    }
 
 
-    render() {
 
-        const allCharacters = this.state;
-        console.log("render all characters", allCharacters.list);
 
-        console.log("character map", this.state.allCharacters)
-       
+    render() {       
         return (
             <div className="filmDisplay">
                 <h2>Star Wars Films</h2>
+                <div className="inputField">
+                    <input
+                        type="text"
+                        value={this.state.search}
+                        onChange={this.handleSearch}
+                        // onKeyDown={this.handleSearch}
+                    />
+                    <button className="resetButton" type="reset" onClick={this.clearSearch}>Clear</button>
+                </div>
                 <ul name="filmList">
                     {this.state.allFilms.map((film, index) => (
                         <div key={index}>

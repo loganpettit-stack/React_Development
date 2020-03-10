@@ -9,8 +9,8 @@ export class Characters extends React.Component {
         allCharacters: [],
         search: "",
         list: [],
-        currentFilm: ""
-
+        currentFilm: "",
+        _isMounted: false
     };
 
 
@@ -73,36 +73,54 @@ export class Characters extends React.Component {
         }
         
         this.setState({charArr, allCharacters: charArr});
+        this.setState({ charArr, list: charArr });
 
     };
 
 
     componentDidMount() {
+        this._isMounted = true;
         this.axiosCall();
     }
 
 
     handleSearch = event => {
         this.setState({
-            searchTerm: event.target.value,
-            posts: this.state.allPosts.filter(post =>
-                post.title.includes(event.target.value)
+            search: event.target.value,
+            allCharacters: this.state.allCharacters.filter(character =>
+                character.name.includes(event.target.value)
             )
         });
     };
 
 
+    clearSearch = event => {
+        console.log("this state", this.state)
+        const allCharacters = this.state.list
+        const search = ""
+
+        this.setState({
+            allCharacters,
+            search
+        });
+
+        console.log("this state after", this.state);
+
+    }
+
 
     render() {
-
-        const allCharacters = this.state;
-        // console.log("render all characters", allCharacters.list);
-
-        // console.log("character map", this.state.allCharacters)
-
         return (
             <div className="characterCards">
                 <h2>Star Wars Characters</h2>
+                <div className="inputField">
+                    <input
+                        type="text"
+                        value={this.state.search}
+                        onChange={this.handleSearch}
+                    />
+                    <button className="resetButton" type="reset" onClick={this.clearSearch}>Clear</button>
+                </div>
                 <ul name="characterDisplay">
                     {this.state.allCharacters.map((character, index) => (
                         <div key={index}>

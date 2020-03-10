@@ -5,14 +5,14 @@ import Collapsible from "react-collapsible";
 
 export class Planets extends React.Component {
 
+
+
     state = {
         allPlanets: [],
-        next: "",
         search: "",
-        list: []
-
+        list: [],
+        _isMounted: false
     };
-
 
     baseURL = "api/";
 
@@ -34,14 +34,14 @@ export class Planets extends React.Component {
             else {
                 url = null;
             }
-        
+
 
             let allPlanets = json.results;
             console.log("allplanets", allPlanets);
 
             allPlanets.forEach(planet => {
 
-               let allFilms = [];
+                let allFilms = [];
 
                 planet.films.forEach(flm => {
 
@@ -63,53 +63,74 @@ export class Planets extends React.Component {
             })
 
             planetsArr.push(...allPlanets);
-
         }
 
         this.setState({ planetsArr, allPlanets: planetsArr });
-
+        this.setState({ planetsArr, list: planetsArr });
     }
 
     componentDidMount() {
+        this._isMounted = true;
         this.axiosCall();
     }
 
 
     handleSearch = event => {
-                this.setState({
-                    searchTerm: event.target.value,
-                    posts: this.state.allPosts.filter(post =>
-                        post.title.includes(event.target.value)
-                    )
-                });
-            };
-
-
-
-        render() {
-
-            return (
-                <div className="planetsDisplay">
-                    <h2>Star Wars Planets</h2>
-                    <ul name="planetsList">
-                        {this.state.allPlanets.map((planet, index) => (
-                            <div key={index}>
-                                <Collapsible trigger={planet.name}>
-                                    <p>Climate: {planet.climate}</p>
-                                    <p>Terrain: {planet.terrain}</p>
-                                    <p>Population: {planet.population}</p>
-                                    <p>Films: </p>
-                                    {planet.films.map((flm, indx) => (
-                                        <div key={indx}>
-                                            <p>{flm}</p>
-                                        </div>
-                                    ))}
-                                </Collapsible>
-                            </div>
-                        ))}
-                    </ul>
-                </div>
+        this.setState({
+            search: event.target.value,
+            allPlanets: this.state.allPlanets.filter(planet =>
+                planet.name.includes(event.target.value)
             )
-        }
+        });
+    };
+
+
+    clearSearch = event => {
+        console.log("this state", this.state)
+        const allPlanets = this.state.list
+        const search = ""
+
+        this.setState({
+            allPlanets,
+            search
+        });
+
+        console.log("this state after", this.state);
 
     }
+
+    render() {
+        return (
+            <div className="planetsDisplay">
+                <h2>Star Wars Planets</h2>
+                <div className="inputField">
+                    <input
+                        id="input"
+                        type="text"
+                        value={this.state.search}
+                        onChange={this.handleSearch}
+                    />
+                    <button className="resetButton" type="reset" onClick={this.clearSearch}>Clear</button>
+                </div>
+                <ul name="planetsList">
+                    {this.state.allPlanets.map((planet, index) => (
+                        <div key={index}>
+                            <Collapsible trigger={planet.name}>
+                                <p>Climate: {planet.climate}</p>
+                                <p>Terrain: {planet.terrain}</p>
+                                <p>Population: {planet.population}</p>
+                                <p>Films: </p>
+                                {planet.films.map((flm, indx) => (
+                                    <div key={indx}>
+                                        <p>{flm}</p>
+                                    </div>
+                                ))}
+                            </Collapsible>
+                        </div>
+                    ))}
+                </ul>
+            </div>
+        )
+    }
+
+}
