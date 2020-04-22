@@ -1,14 +1,18 @@
 const fetch = require("node-fetch");
 const express = require("express");
-const bodyParser = require("../../lib/middleware/bodyParser");
 
 const baseURL = 'https://jsonplaceholder.typicode.com/';
 
-const getAllPosts = (request, response) => {
+const getAllPosts = async (request, response) => {
     const URL = baseURL + 'posts';
-    fetch(URL)
-        .then(res => res.json())
-        .then(json => response.send({ json }));
+    try {
+        const res = await fetch(URL);
+        const posts = await res.json();
+        response.send(posts);
+    } catch (err) {
+        response.status(500);
+        response.send(err);
+    }
 }
 
 const getAllPostsByUser = async (request, response) => {
@@ -39,21 +43,18 @@ const getAllPostsByUser = async (request, response) => {
             const res2 = await fetch(postsByUserURL);
             const posts = await res2.json();
             found = 1;
-            response.send(
-                posts
-            )
+            response.send(posts);
         }
     }
 
     if (!found) {
         const notFound = "Username not found";
-        response.send(
-            notFound
-        )
+        response.status(500);
+        response.send(notFound);
     }
 }
 
-// async version of the call
+
 const getPostsById = async (request, response) => {
     const postId = request.params.postId;
     const URL = baseURL + 'posts/' + postId;
@@ -70,15 +71,11 @@ const getPostsById = async (request, response) => {
     }
 
     if (postCount > 0) {
-        response.send(
-            postsById
-        )
+        response.send(postsById);
     }
     else {
         const notFound = "Post not found"
-        response.send(
-            notFound
-        )
+        response.send(notFound);
     }
 
 }
@@ -86,25 +83,39 @@ const getPostsById = async (request, response) => {
 const getUsersNameByUsername = async (request, response) => {
     const username = request.params.username;
     const URL = baseURL + 'users';
+    const userchunk = [];
+    var found = 0; 
 
     const res = await fetch(URL);
     const users = await res.json();
 
+    // console.log(users);
     for (user in users) {
         let uname = users[user].username;
         let name = users[user].name;
 
+
         if (uname === username) {
-            response.send(
-                name
-            )
+            uname = "username: " + users[user].username;
+            name = "name: " + users[user].name;
+            userchunk.push(uname);
+            userchunk.push(name);
+            found = 1; 
+            break;
         } else {
-            const notfound = "Username not found";
-            response.send(
-                notfound
-            )
+            found = 0;
         }
+
     }
+    
+    if(found){
+        response.send(userchunk);
+    } else {
+        const notfound = "Username not found";
+            response.send(notfound);
+    }
+
+
 
 }
 

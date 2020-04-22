@@ -6,7 +6,7 @@ const v2 = require("./routes/v2/routes")
 const app = express();
 
 app.use("/v1", v1);
-// app.use("/v2", v2);
+app.use("/v2", v2);
 
 const port = 3000;
 app.listen(port);
