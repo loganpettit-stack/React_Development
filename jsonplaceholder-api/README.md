@@ -1,68 +1,65 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+How to use endpoints:
 
-## Available Scripts
+V1: Retrieves data via network calls to https://jsonplaceholder.typicode.com/
 
-In the project directory, you can run:
+GET /v1/allPosts - retrieves all posts from https://jsonplaceholder.typicode.com/
 
-### `npm start`
+GET /v1/allPosts/<username> - retrieve all posts created by a specific user from https://jsonplaceholder.typicode.com/
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+GET /v1/posts/<postId> - retrieves all posts by the post ID from https://jsonplaceholder.typicode.com/
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+GET v1/profile/<username> - retrieves a users name from their username from https://jsonplaceholder.typicode.com/
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+V2: Implements CRUD operations using mongoDB
 
-### `npm run build`
+Generate database entries:
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+GET /v2/loadUsers - Takes already created users data from https://jsonplaceholder.typicode.com/ and loads it into the database. 
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+GET /v2/loadPosts - Takes already created post data from https://jsonplaceholder.typicode.com/ and loads it into the database. 
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+POST /v2/insertUser - Takes an array of user objects in the post body of request and populates the mongo database with these users .
 
-### `npm run eject`
+User object: 
+[
+    {
+        id: String,
+        name: String,
+        username: String,
+        email: String,
+        phone: String,
+        website: String,
+        company: {
+            name: String,
+            catchPhrase: String,
+            bs: String
+        }
+    }
+]
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+POST /v2/createPost - Takes an array of post objects in the post body of request and populates the mongo database with these posts
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Post object:
+[
+    {
+        userID: String,
+        id: String,
+        title: String,
+        body: String
+    }   
+]
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+CRUD operations: 
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+GET /v2/allPosts - Retrieves all posts from database
 
-## Learn More
+GET /v2/allPosts/<username> - Retrieves all posts in database created by a specific user specified in username parameter
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+GET /v2/profile/<username> - Retrieves user profile data from database specified by username parameter
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+GET /v2/posts/<postID> - Retrieves a post from data base that is refered to by provided post ID.
 
-### Code Splitting
+PATCH /v2/posts/<postID> - Updates a post from data base that is refered to by provided post ID. 
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+DELETE /v2/posts/<postID> - Removes a posf from data base that is refered to by provided post ID. 
